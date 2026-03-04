@@ -2,248 +2,199 @@
 
 # 🧠 MindLink EEG
 
-### Real-Time Mental Fatigue & Cognitive Monitoring System
+**Real-Time Mental Fatigue & Cognitive Monitoring — Native iPad App**
 
-*A complete EEG pipeline — from raw brainwaves to intelligent alerts — running natively on iPad*
+*Raw brainwaves → band powers → fatigue score → instant email alerts. Everything runs on-device.*
 
-[![Swift](https://img.shields.io/badge/Swift-5.9-orange?logo=swift)](https://swift.org)
-[![iOS](https://img.shields.io/badge/iOS-17+-blue?logo=apple)](https://developer.apple.com/ios/)
-[![Python](https://img.shields.io/badge/Python-3.10+-yellow?logo=python)](https://python.org)
-[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![Swift](https://img.shields.io/badge/Swift-5.9-orange?logo=swift&logoColor=white)](https://swift.org)
+[![iPadOS](https://img.shields.io/badge/iPadOS-17+-black?logo=apple)](https://developer.apple.com)
+[![Xcode](https://img.shields.io/badge/Xcode-15+-147EFB?logo=xcode&logoColor=white)](https://developer.apple.com/xcode/)
+[![License](https://img.shields.io/badge/License-MIT-brightgreen)](LICENSE)
 
 </div>
 
 ---
 
-## ✨ Overview
+## Overview
 
-MindLink is an EEG-based mental fatigue detection system that connects directly to the **NeuroSky TGAM1** headset and monitors your cognitive state in real time. It ships as both a **native iPad app** (SwiftUI) and a **Python server** for desktop use.
+MindLink is a **native SwiftUI iPad application** that pairs with the NeuroSky TGAM1 EEG headset over Bluetooth Classic and gives you a complete real-time view of your cognitive state. The entire signal processing pipeline runs on-device using Apple's **Accelerate / vDSP** framework — no server, no cloud, no external services.
 
-No cloud. No external server. The entire pipeline — signal processing, feature extraction, fatigue scoring, and alerting — runs on-device.
-
----
-
-## 📱 iPad App — Features
-
-<table>
-<tr>
-<td width="50%">
-
-**Dashboard**
-- Live attention & meditation scores
-- Fatigue score gauge (0–1)
-- Cognitive drift indicator
-- α/β and θ/α frequency ratios
-- Real-time trend charts
-
-**Brain Waves**
-- 8 animated circular ring gauges
-- δ Delta · θ Theta · α Low/High
-- β Low/High · γ Low/High
-- Dominant band detection
-- Brain state interpretation
-
-**Sessions**
-- Record study/work sessions
-- Wellness score (A–F grade)
-- Session history with stats
-- Per-session alert count
-
-</td>
-<td width="50%">
-
-**Raw Data**
-- Real-time ECG-style waveform (512 Hz)
-- All 8 TGAM1 band powers
-- Packet rate & byte counter
-- Device test checklist (8 checks)
-
-**Alerts**
-- Fatigue alert history
-- Low · Medium · High · Critical levels
-- Cognitive drift escalation
-
-**Settings**
-- Custom attention/meditation thresholds
-- Email alerts via Apple Mail
-- iOS push notifications
-- Alert cooldown control
-
-</td>
-</tr>
-</table>
+When your attention drops or fatigue builds, the app fires an **automatic email alert** directly via SMTP.
 
 ---
 
-## 🏗️ Architecture
+## Features
+
+| Tab | Features |
+|---|---|
+| **Dashboard** | Live attention, meditation, fatigue · Cognitive drift · Calibration progress ring · Wellness score · Session record/stop |
+| **Brain Waves** | 8 animated ring gauges (δ θ α-Lo α-Hi β-Lo β-Hi γ-Lo γ-Hi) · Dominant band card · Brain state interpretation · Live metric rings |
+| **Sessions** | Record sessions · Wellness grade (A–F) · Session history · Per-session averages |
+| **Raw Data** | ECG waveform (512 Hz live) · 8 live value cells · Band power bars with % · 8-item device test checklist |
+| **Alerts** | Alert history log · Fatigue level timeline |
+| **Settings** | Recipient email · Email toggles · Threshold sliders per metric · Cooldown control · Test email button |
+
+---
+
+## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         iPad App (Swift)                        │
-│                                                                 │
-│  TGAM1 ──BT──▶ BluetoothManager ──▶ TGAM1Parser               │
-│                     │                    │                      │
-│                     ▼                    ▼                      │
-│              SignalProcessor        Raw Ring Buffer             │
-│            (vDSP FFT / Accelerate)  (512 samples, 20fps)       │
-│                     │                                           │
-│                     ▼                                           │
-│           FeatureExtractor ──▶ FatiguePredictor                │
-│           (baseline · drift ·    (rule-based score)            │
-│            rolling stats)              │                        │
-│                     │                  ▼                        │
-│                     └──────────▶ AlertSystem                   │
-│                                   │        │                    │
-│                            In-App │   Push │  Email            │
-│                            Banner │  (UNS) │  (MFMail)         │
-└─────────────────────────────────────────────────────────────────┘
+NeuroSky TGAM1 Headset
+        │ Bluetooth Classic (SPP/RFCOMM)
+        ▼
+  BluetoothManager  ──────────────────────────────────────────────
+   │                                                              │
+   ├─ TGAM1Parser                                                 │
+   │    ├─ 0x80 RAW (512 Hz) ──→ rawEEGSamples ring buffer       │
+   │    ├─ 0x83 EEG_POWER    ──→ 8 band powers (δθαβγ)          │
+   │    ├─ 0x04 ATTENTION                                         │
+   │    ├─ 0x05 MEDITATION                                        │
+   │    └─ 0x02 POOR_SIGNAL                                       │
+   │                                                              │
+   ├─ SignalProcessor     (vDSP FFT, Hann window)                 │
+   ├─ FeatureExtractor    (30-sample baseline, rolling stats)     │
+   ├─ FatiguePredictor    (rule-based score 0–1)                  │
+   └─ AlertSystem         (4-level cooldown-aware alerts)         │
+                                                                  │
+  AlertSettings                                                   │
+   └─ SMTPSender  ─── smtp.hostinger.com:465 (SSL) ──→ Email     │
+                                                                  │
+  SessionManager  ──── wellness score, session history ───────────┘
+  NotificationManager ── UNUserNotificationCenter (push)
 ```
 
 ---
 
-## 🧬 EEG Pipeline (Ported from Python → Swift)
-
-| Python Module | Swift Equivalent | What it does |
-|---|---|---|
-| `signal_processor.py` | `SignalProcessor.swift` | Hann window FFT → band powers (Accelerate / vDSP) |
-| `feature_extractor.py` | `FeatureExtractor.swift` | Baseline calibration, rolling stats, cognitive drift |
-| `ml_model.py` | `FatiguePredictor.swift` | Rule-based fatigue score (GBR fallback from Python) |
-| `alert_system.py` | `AlertSystem.swift` | Cooldown-aware alerts with level escalation |
-| `config.py` | `Config.swift` | All thresholds & constants |
-
-> **Note on ML model:** The Python implementation uses `GradientBoostingRegressor` (scikit-learn).
-> Since sklearn can't run on iOS, we port the identical `_rule_based_predict` fallback — results are the same since no pre-trained model is loaded.
-
----
-
-## ⚡ Fatigue Score Formula
+## Fatigue Score
 
 ```
-Fatigue = (1 − attention/100) × 0.30
-        + (1 − meditation/100) × 0.20
-        + min(alpha × 2, 1)    × 0.20   ← high alpha → drowsy
-        + (1 − min(beta×3, 1)) × 0.15   ← low beta → less alert
-        + min(theta × 3, 1)    × 0.15   ← high theta → drowsy
+Score = (1 − attention/100)  × 0.30
+      + (1 − meditation/100) × 0.20
+      + min(alpha × 2, 1)    × 0.20   ← drowsy indicator
+      + (1 − min(beta × 3, 1)) × 0.15 ← alertness indicator
+      + min(theta × 3, 1)    × 0.15   ← drowsiness indicator
 
-Level:  Low < 0.10 · Medium < 0.20 · High < 0.30 · Critical ≥ 0.30
+Levels:  ● Low < 0.10   ● Medium < 0.20   ● High < 0.30   ● Critical ≥ 0.30
 ```
 
 ---
 
-## 📁 Project Structure
+## Email Alerts
 
-```
-mind-link-1/
-│
-├── 📱 MindLinkApp/                     # Native iPad Xcode project
-│   ├── project.yml                     # XcodeGen spec
-│   └── MindLinkApp/
-│       ├── App/
-│       │   ├── MindLinkApp.swift       # App entry point
-│       │   └── Info.plist
-│       ├── Bluetooth/
-│       │   ├── BluetoothManager.swift  # CoreBluetooth + ExternalAccessory
-│       │   └── TGAM1Parser.swift       # Binary packet parser (AA AA sync)
-│       ├── Processing/
-│       │   ├── Config.swift            # All constants & thresholds
-│       │   ├── SignalProcessor.swift   # vDSP FFT, band powers
-│       │   ├── FeatureExtractor.swift  # Baseline, drift, fatigue score
-│       │   ├── FatiguePredictor.swift  # Rule-based prediction
-│       │   ├── AlertSystem.swift       # Cooldown alert engine
-│       │   ├── AlertSettings.swift     # Custom thresholds (UserDefaults)
-│       │   └── SessionManager.swift    # Session recording & wellness score
-│       └── Views/
-│           ├── ContentView.swift       # 6-tab main view
-│           ├── BrainWavesView.swift    # Circular band ring gauges
-│           ├── RawDataView.swift       # ECG waveform + device test
-│           ├── SessionHistoryView.swift# Session list + wellness rings
-│           ├── AlertSettingsView.swift # Email + threshold sliders
-│           └── Components.swift       # Shared chart & card components
-│
-├── 🐍 Python Server (optional desktop fallback)
-│   ├── main.py                        # Entry point
-│   ├── web_server.py                  # Flask web dashboard
-│   ├── bluetooth_connector.py         # PyBluez RFCOMM connector
-│   ├── signal_processor.py            # NumPy/SciPy FFT pipeline
-│   ├── feature_extractor.py           # Feature computation
-│   ├── ml_model.py                    # GBR + rule-based fallback
-│   ├── alert_system.py                # Alert engine
-│   ├── config.py                      # Configuration
-│   └── requirements.txt
-│
-└── 📊 static/
-    └── index.html                     # Web dashboard (served by Flask)
-```
+Sent automatically via **SMTP** when a threshold is crossed:
+
+- `⚠️ Low Attention` — attention drops below your set threshold
+- `⚠️ High Stress` — meditation (calm) level is low
+- `🔴 Fatigue Alert` — fatigue score exceeds your threshold
+
+Configurable cooldown (default 5 min) prevents repeated notifications.
 
 ---
 
-## 🔌 Hardware
+## Hardware Specs
 
 | Spec | Value |
 |---|---|
-| **Chipset** | NeuroSky TGAM1 |
-| **Protocol** | ThinkGear (AA AA sync bytes) |
-| **Baud Rate** | 57,600 |
-| **Connectivity** | Bluetooth Classic 3.0 (SPP/RFCOMM) |
-| **Electrodes** | 3 × forehead (EEG · GND · REF) |
-| **Sample Rate** | 512 Hz raw EEG |
-| **Band Output** | ~1 Hz (8 bands: δ θ α-lo α-hi β-lo β-hi γ-lo γ-hi) |
-| **Battery** | Li-ion 3.7V 180 mAh |
-| **Run Time** | 4–5 hours |
+| Chip | NeuroSky TGAM1 |
+| Protocol | ThinkGear — sync bytes 0xAA 0xAA |
+| Band Powers | Code `0x83` · 8 bands · 24 bytes · ~1 Hz |
+| Raw EEG | Code `0x80` · 512 Hz · 16-bit signed |
+| Attention / Meditation | Codes `0x04` `0x05` · 0–100 |
+| Connectivity | Bluetooth Classic 3.0 — SPP (RFCOMM) |
+| Electrodes | 3 × forehead (EEG · GND · REF) |
+| Battery | Li-ion 3.7V · 180 mAh · ~4–5 hr |
 
 ---
 
-## 🚀 Getting Started
+## Project Structure
 
-### iPad App
+```
+MindLinkApp/
+├── project.yml                          # XcodeGen project spec
+└── MindLinkApp/
+    ├── App/
+    │   ├── MindLinkApp.swift            # @main entry point
+    │   └── AppTheme.swift               # ← Change accent color here to retheme entire app
+    │
+    ├── Bluetooth/
+    │   ├── BluetoothManager.swift       # CoreBluetooth + ExternalAccessory session
+    │   └── TGAM1Parser.swift            # Binary frame decoder (0xAA 0xAA sync)
+    │
+    ├── Processing/
+    │   ├── Config.swift                 # All constants & thresholds
+    │   ├── SignalProcessor.swift        # vDSP FFT → band powers (Accelerate)
+    │   ├── FeatureExtractor.swift       # Baseline calibration, drift, rolling stats
+    │   ├── FatiguePredictor.swift       # Rule-based fatigue score
+    │   ├── AlertSystem.swift            # 4-level cooldown-aware alert engine
+    │   ├── AlertSettings.swift          # User thresholds persisted in UserDefaults
+    │   ├── SessionManager.swift         # Session recording, wellness score, history
+    │   └── GoogleSMTPSender.swift       # Hostinger SMTP client (Network.framework, port 465)
+    │
+    └── Views/
+        ├── ContentView.swift            # 6-tab root + all shared state
+        ├── BrainWavesView.swift         # 8 circular band ring gauges
+        ├── RawDataView.swift            # ECG waveform + device test checklist
+        ├── SessionHistoryView.swift     # Session list + wellness rings
+        ├── AlertSettingsView.swift      # Email config + threshold sliders
+        └── Components.swift             # Shared MetricCard, TrendChart, BandBarChart
+```
 
-**Requirements:** Mac with Xcode 15+, XcodeGen, free Apple ID
+---
+
+## Getting Started
+
+**Requirements:** Mac · Xcode 15+ · [XcodeGen](https://github.com/yonaskolb/XcodeGen)
 
 ```bash
 # Install XcodeGen (once)
 brew install xcodegen
 
-# Generate Xcode project
-cd MindLinkApp && xcodegen generate
+# Generate the Xcode project
+cd MindLinkApp
+xcodegen generate
 
 # Open in Xcode
 open MindLinkApp.xcodeproj
 ```
 
-1. Connect iPad via USB  
-2. In Xcode → select your iPad as destination  
-3. Signing & Capabilities → set your Team (free Apple ID works)  
-4. Press **▶ Run** (⌘R)  
-5. On iPad: Settings → Bluetooth → pair MindLink  
-6. Open app → tap **Scan** → connect → calibrate for 30 seconds
+1. Connect iPad via USB
+2. Select your iPad as the run destination in Xcode
+3. **Signing & Capabilities** → set your Team (free Apple ID works)
+4. Press **▶ Run** (`⌘R`)
+5. On your iPad: **Settings → Bluetooth** → pair MindLink device
+6. Open the app → tap **Scan → Connect**
+7. Wait ~30 seconds for calibration (collects 30-sample baseline)
+8. Monitoring begins automatically
 
-### Python Server (optional)
+---
 
-```bash
-pip install -r requirements.txt
-python main.py
-# Visit http://<your-mac-ip>:5000 from any browser on the same network
+## Theming
+
+The entire app uses **one accent color**. Edit a single line to retheme everything:
+
+```swift
+// App/AppTheme.swift
+static let accent = Color(red: 0.22, green: 0.45, blue: 1.0)  // vivid blue
 ```
 
 ---
 
-## 📡 How the App Connects to MindLink
+## Frameworks Used
 
-```
-iPad Settings → Bluetooth: pair MindLink (Classic BT)
-         ↓
-ExternalAccessory framework (EASession, protocol: com.neurosky.thinkgear)
-         ↓
-StreamDelegate reads RFCOMM bytes → TGAM1Parser finds AA AA sync frames
-         ↓
-Checksum-validated packets → BluetoothManager → EEG Pipeline
-```
-
-> **Calibration:** The app collects 30 packets (~30 seconds) to establish your personal baseline before fatigue scoring begins.
+| Framework | Purpose |
+|---|---|
+| `SwiftUI` | All UI and navigation |
+| `CoreBluetooth` | BLE scanning |
+| `ExternalAccessory` | RFCOMM stream (TGAM1 uses Classic BT) |
+| `Accelerate / vDSP` | FFT and signal processing |
+| `Charts` | ECG waveform, trend lines, bar charts |
+| `Network` | SSL SMTP connection (port 465) |
+| `UserNotifications` | On-device push alerts |
+| `Combine` | `@Published` reactive data flow |
 
 ---
 
-## 👥 Authors
+## Authors
 
 | Name | Student ID |
 |---|---|
@@ -253,5 +204,5 @@ Checksum-validated packets → BluetoothManager → EEG Pipeline
 ---
 
 <div align="center">
-<sub>Built with ❤️ using Swift, SwiftUI, Accelerate, and NeuroSky TGAM1</sub>
+<sub>Built with SwiftUI · Accelerate · Network.framework · NeuroSky TGAM1</sub>
 </div>
