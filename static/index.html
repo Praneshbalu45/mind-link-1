@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MindLink">
+  <title>MindLink EEG Monitor</title>
+
+  <!-- Chart.js + SocketIO (CDN, no install needed) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.2/dist/socket.io.min.js"></script>
+
+  <style>
+    /* ── Reset & tokens ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --border:    #30363d;
+      --purple:    #a78bfa;
+      --blue:      #38bdf8;
+      --green:     #4ade80;
+      --amber:     #f59e0b;
+      --red:       #f87171;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --radius:    14px;
+    }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, 'SF Pro Display', Arial, sans-serif; overflow-x: hidden; }
+
+    /* ── Layout ─────────────────────────────────────────────────────────── */
+    #app { display: flex; flex-direction: column; height: 100dvh; }
+
+    header {
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px 10px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon { font-size: 26px; }
+    .brand-title { font-size: 18px; font-weight: 700; color: var(--purple); }
+    .brand-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    /* Connection pill */
+    #conn-pill {
+      display: flex; align-items: center; gap: 7px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 30px; padding: 6px 14px;
+      font-size: 12px; font-weight: 600; color: var(--muted);
+      transition: color .3s, border-color .3s;
+    }
+    #conn-pill .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--muted); transition: background .3s;
+      flex-shrink: 0;
+    }
+    #conn-pill.connected   { color: var(--green);  border-color: var(--green); }
+    #conn-pill.connected .dot { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    #conn-pill.scanning    { color: var(--amber);  border-color: var(--amber); }
+    #conn-pill.scanning .dot { background: var(--amber); animation: pulse 1s infinite; }
+    #conn-pill.error       { color: var(--red);    border-color: var(--red); }
+    #conn-pill.error .dot  { background: var(--red); }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ── Scroll container ───────────────────────────────────────────────── */
+    main { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+
+    /* ── Cards ──────────────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px;
+    }
+    .card-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+
+    /* ── Big metric row ─────────────────────────────────────────────────── */
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .metric {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
+      padding: 14px 10px; text-align: center;
+    }
+    .metric-value { font-size: 36px; font-weight: 800; line-height: 1; }
+    .metric-label { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing:.05em; }
+    .metric-sub   { font-size: 11px; margin-top: 6px; font-weight: 600; }
+    .val-attn     { color: var(--blue); }
+    .val-med      { color: var(--green); }
+    .val-fatigue  { color: var(--purple); }
+    .fatigue-low  { color: var(--green); }
+    .fatigue-med  { color: var(--amber); }
+    .fatigue-high { color: var(--red); }
+
+    /* ── Fatigue gauge ──────────────────────────────────────────────────── */
+    .gauge-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    #gauge-canvas { max-width: 260px; width: 100%; }
+    .gauge-label  { font-size: 13px; font-weight: 700; color: var(--muted); }
+
+    /* ── Charts ─────────────────────────────────────────────────────────── */
+    .chart-wrap { position: relative; width: 100%; height: 180px; }
+
+    /* ── Band bars ──────────────────────────────────────────────────────── */
+    .bands { display: flex; gap: 8px; align-items: flex-end; height: 90px; margin-top: 4px; }
+    .band-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .band-bar-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+    .band-bar { width: 100%; border-radius: 6px 6px 0 0; transition: height .4s ease; min-height: 3px; }
+    .band-name  { font-size: 10px; color: var(--muted); text-transform: uppercase; }
+    .band-delta  { background: #c084fc; }
+    .band-theta  { background: #4ade80; }
+    .band-alpha  { background: #f87171; }
+    .band-beta   { background: #38bdf8; }
+    .band-gamma  { background: #fb923c; }
+
+    /* ── Scan log ───────────────────────────────────────────────────────── */
+    #scan-log {
+      background: #0a0e14; border: 1px solid var(--border); border-radius: 10px;
+      padding: 10px 12px; height: 100px; overflow-y: auto;
+      font-family: 'SF Mono', monospace; font-size: 11px; color: #67e8f9;
+    }
+    #scan-log p { margin: 1px 0; }
+
+    /* ── Control buttons ─────────────────────────────────────────────────── */
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btn {
+      border: none; border-radius: 12px; padding: 14px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      transition: opacity .15s, transform .1s; touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active { opacity: .7; transform: scale(.97); }
+    .btn-primary  { background: #7c3aed; color: #fff; }
+    .btn-success  { background: #166534; color: #fff; }
+    .btn-danger   { background: #7f1d1d; color: #fff; }
+    .btn-ghost    { background: var(--border); color: var(--text); }
+    .btn:disabled { opacity: .35; pointer-events: none; }
+
+    /* ── Alert banner ───────────────────────────────────────────────────── */
+    #alert-banner {
+      position: fixed; top: 70px; left: 12px; right: 12px; z-index: 999;
+      border-radius: 12px; padding: 14px 18px;
+      font-size: 14px; font-weight: 700;
+      display: none; align-items: center; gap: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.6);
+      animation: slideIn .3s ease;
+    }
+    #alert-banner.show { display: flex; }
+    #alert-banner.critical { background: #450a0a; border: 2px solid var(--red); color: var(--red); }
+    #alert-banner.high     { background: #431407; border: 2px solid var(--amber); color: var(--amber); }
+    #alert-banner .alert-icon { font-size: 22px; flex-shrink: 0; }
+    #alert-banner .alert-close { margin-left: auto; cursor: pointer; font-size: 18px; opacity: .7; }
+    @keyframes slideIn { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ── Phase badge ────────────────────────────────────────────────────── */
+    #phase-badge {
+      display: inline-block; border-radius: 20px; padding: 3px 12px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing:.06em;
+      background: var(--border); color: var(--muted);
+    }
+    #phase-badge.monitoring  { background: #1e3a5f; color: var(--blue); }
+    #phase-badge.calibrating { background: #3b2f00; color: var(--amber); }
+
+    /* ── Landscape tweaks (iPad) ────────────────────────────────────────── */
+    @media (min-width: 700px) {
+      .metrics { grid-template-columns: repeat(4, 1fr); }
+      .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      .chart-wrap { height: 220px; }
+    }
+    @media (min-width: 1000px) {
+      main { padding: 20px 28px; }
+      .dashboard-grid { grid-template-columns: 2fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <span class="brand-icon">🧠</span>
+      <div>
+        <div class="brand-title">MindLink</div>
+        <div class="brand-sub">EEG Mental Fatigue Monitor</div>
+      </div>
+    </div>
+    <div id="conn-pill">
+      <span class="dot"></span>
+      <span id="conn-text">Not connected</span>
+    </div>
+  </header>
+
+  <!-- Alert Banner -->
+  <div id="alert-banner">
+    <span class="alert-icon">⚠️</span>
+    <span id="alert-msg">Alert</span>
+    <span class="alert-close" onclick="dismissAlert()">✕</span>
+  </div>
+
+  <main>
+
+    <!-- Phase + Device row -->
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span id="phase-badge">Idle</span>
+      <span id="device-label" style="font-size:12px;color:var(--muted)"></span>
+    </div>
+
+    <!-- Big metrics -->
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-value val-attn" id="val-attn">—</div>
+        <div class="metric-label">Attention</div>
+      </div>
+      <div class="metric">
+        <div class="metric-value val-med" id="val-med">—</div>
+        <div class="metric-label">Meditation</div>
+      </div>
+      <div class="metric">
+        <div class="metric-value val-fatigue" id="val-fatigue">—</div>
+        <div class="metric-label">Fatigue</div>
+        <div class="metric-sub" id="val-fatigue-level">—</div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+
+      <!-- Attention / Meditation chart -->
+      <div class="card">
+        <div class="card-title">Attention &amp; Meditation</div>
+        <div class="chart-wrap">
+          <canvas id="chart-attn-med"></canvas>
+        </div>
+      </div>
+
+      <!-- Frequency bands -->
+      <div class="card">
+        <div class="card-title">Frequency Bands</div>
+        <div class="bands">
+          <div class="band-col">
+            <div class="band-bar-wrap"><div class="band-bar band-delta" id="bar-delta" style="height:3px"></div></div>
+            <div class="band-name">δ Delta</div>
+          </div>
+          <div class="band-col">
+            <div class="band-bar-wrap"><div class="band-bar band-theta" id="bar-theta" style="height:3px"></div></div>
+            <div class="band-name">θ Theta</div>
+          </div>
+          <div class="band-col">
+            <div class="band-bar-wrap"><div class="band-bar band-alpha" id="bar-alpha" style="height:3px"></div></div>
+            <div class="band-name">α Alpha</div>
+          </div>
+          <div class="band-col">
+            <div class="band-bar-wrap"><div class="band-bar band-beta" id="bar-beta" style="height:3px"></div></div>
+            <div class="band-name">β Beta</div>
+          </div>
+          <div class="band-col">
+            <div class="band-bar-wrap"><div class="band-bar band-gamma" id="bar-gamma" style="height:3px"></div></div>
+            <div class="band-name">γ Gamma</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fatigue score chart -->
+      <div class="card">
+        <div class="card-title">Fatigue Score Over Time</div>
+        <div class="chart-wrap">
+          <canvas id="chart-fatigue"></canvas>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="card">
+        <div class="card-title">Controls</div>
+        <div class="btn-row" style="margin-bottom:10px;">
+          <button class="btn btn-primary" id="btn-autoconnect" onclick="autoConnect()">⚡ Auto-Connect</button>
+          <button class="btn btn-success" id="btn-start" onclick="startMonitoring()" disabled>▶ Start</button>
+        </div>
+        <div class="btn-row" style="margin-bottom:14px;">
+          <button class="btn btn-danger"  id="btn-stop"  onclick="stopMonitoring()"  disabled>■ Stop</button>
+          <button class="btn btn-ghost"   id="btn-disc"  onclick="disconnect()"      disabled>✖ Disconnect</button>
+        </div>
+        <div class="card-title">Scan Log</div>
+        <div id="scan-log"></div>
+      </div>
+
+    </div><!-- /dashboard-grid -->
+  </main>
+</div><!-- /app -->
+
+<script>
+// ── SocketIO connection ───────────────────────────────────────────────────
+const socket = io({ transports: ['websocket', 'polling'] });
+
+// ── Chart history ─────────────────────────────────────────────────────────
+const MAX_PTS = 120;
+const labels = [];
+const attnData   = [];
+const medData    = [];
+const fatigueData = [];
+
+// ── Chart: Attention / Meditation ─────────────────────────────────────────
+const ctxAM = document.getElementById('chart-attn-med').getContext('2d');
+const chartAM = new Chart(ctxAM, {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [
+      { label: 'Attention',  data: attnData,   borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,.08)', borderWidth: 2, pointRadius: 0, tension: .4, fill: true },
+      { label: 'Meditation', data: medData,     borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,.08)', borderWidth: 2, pointRadius: 0, tension: .4, fill: true },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    animation: false,
+    scales: {
+      x: { display: false },
+      y: { min: 0, max: 100, grid: { color: '#21262d' }, ticks: { color: '#8b949e', font: { size: 10 } } }
+    },
+    plugins: { legend: { labels: { color: '#8b949e', font: { size: 11 } } } }
+  }
+});
+
+// ── Chart: Fatigue ────────────────────────────────────────────────────────
+const ctxF = document.getElementById('chart-fatigue').getContext('2d');
+const chartF = new Chart(ctxF, {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [
+      { label: 'Fatigue', data: fatigueData, borderColor: '#a78bfa', backgroundColor: 'rgba(167,139,250,.1)', borderWidth: 2.5, pointRadius: 0, tension: .4, fill: true },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    animation: false,
+    scales: {
+      x: { display: false },
+      y: {
+        min: 0, max: 1,
+        grid: { color: '#21262d' },
+        ticks: { color: '#8b949e', font: { size: 10 } }
+      }
+    },
+    plugins: {
+      legend: { display: false },
+      annotation: { /* warning line — add chart.js annotation plugin if desired */ }
+    }
+  }
+});
+
+// ── EEG data handler ──────────────────────────────────────────────────────
+let tickCount = 0;
+socket.on('eeg_data', d => {
+  // Metrics
+  setEl('val-attn',   fmt(d.attention));
+  setEl('val-med',    fmt(d.meditation));
+  setEl('val-fatigue', d.fatigue_score.toFixed(3));
+
+  const lvl = d.fatigue_level || 'low';
+  const lvlEl = document.getElementById('val-fatigue-level');
+  lvlEl.textContent = lvl.toUpperCase();
+  lvlEl.className = `metric-sub fatigue-${lvl === 'critical' || lvl === 'high' ? 'high' : lvl === 'medium' ? 'med' : 'low'}`;
+
+  // Phase badge
+  const badge = document.getElementById('phase-badge');
+  badge.textContent = d.phase || 'idle';
+  badge.className = `phase-badge ${d.phase || ''}`;
+
+  // Charts
+  const t = tickCount++;
+  if (labels.length >= MAX_PTS) { labels.shift(); attnData.shift(); medData.shift(); fatigueData.shift(); }
+  labels.push(t);
+  attnData.push(d.attention);
+  medData.push(d.meditation);
+  fatigueData.push(d.fatigue_score);
+  chartAM.update('none');
+  chartF.update('none');
+
+  // Band bars (normalise to max)
+  const bands = d.freq_bands || {};
+  updateBands(bands);
+});
+
+function updateBands(bands) {
+  const vals = {
+    delta: bands.delta || 0,
+    theta: bands.theta || 0,
+    alpha: bands.alpha || 0,
+    beta:  bands.beta  || 0,
+    gamma: bands.gamma || 0,
+  };
+  const max = Math.max(...Object.values(vals), 1e-9);
+  for (const [k, v] of Object.entries(vals)) {
+    const bar = document.getElementById(`bar-${k}`);
+    if (bar) bar.style.height = Math.max(3, (v / max) * 78) + 'px';
+  }
+}
+
+// ── Connection events ─────────────────────────────────────────────────────
+socket.on('connection_change', d => {
+  if (d.connected) {
+    setConnected(d.device, d.port);
+  } else {
+    setDisconnected();
+  }
+});
+
+socket.on('monitoring_change', d => {
+  setMonitoringState(d.running);
+});
+
+socket.on('scan_log', d => appendLog(d.msg));
+
+socket.on('alert', d => showAlert(d.level, d.message));
+
+socket.on('status', d => {
+  if (d.connected) setConnected(d.device, d.port);
+  setMonitoringState(d.running);
+  if (d.demo) appendLog('ℹ  Demo mode — simulated data');
+});
+
+// ── UI state helpers ──────────────────────────────────────────────────────
+function setConnected(device, port) {
+  const pill = document.getElementById('conn-pill');
+  pill.className = 'connected';
+  document.getElementById('conn-text').textContent = port || 'Connected';
+  document.getElementById('device-label').textContent = device || '';
+  document.getElementById('btn-autoconnect').disabled = true;
+  document.getElementById('btn-start').disabled = false;
+  document.getElementById('btn-disc').disabled = false;
+}
+
+function setDisconnected() {
+  const pill = document.getElementById('conn-pill');
+  pill.className = '';
+  document.getElementById('conn-text').textContent = 'Not connected';
+  document.getElementById('device-label').textContent = '';
+  document.getElementById('btn-autoconnect').disabled = false;
+  document.getElementById('btn-start').disabled = true;
+  document.getElementById('btn-stop').disabled = true;
+  document.getElementById('btn-disc').disabled = true;
+  document.getElementById('phase-badge').textContent = 'Idle';
+  document.getElementById('phase-badge').className = '';
+}
+
+function setMonitoringState(running) {
+  document.getElementById('btn-start').disabled = running;
+  document.getElementById('btn-stop').disabled = !running;
+}
+
+// ── API calls ─────────────────────────────────────────────────────────────
+async function autoConnect() {
+  setScanning();
+  appendLog('═══ Starting universal EEG scan ═══');
+  const res = await fetch('/api/start', { method: 'POST' });
+  const data = await res.json();
+  if (!res.ok) {
+    document.getElementById('conn-pill').className = 'error';
+    document.getElementById('conn-text').textContent = 'Not found';
+    appendLog('✗ Device not found — is sensor powered & paired?');
+  }
+}
+
+async function startMonitoring() {
+  await fetch('/api/start', { method: 'POST' });
+}
+
+async function stopMonitoring() {
+  await fetch('/api/stop', { method: 'POST' });
+}
+
+async function disconnect() {
+  await fetch('/api/disconnect', { method: 'POST' });
+  setDisconnected();
+}
+
+function setScanning() {
+  const pill = document.getElementById('conn-pill');
+  pill.className = 'scanning';
+  document.getElementById('conn-text').textContent = 'Scanning…';
+  document.getElementById('btn-autoconnect').disabled = true;
+}
+
+// ── Alert banner ──────────────────────────────────────────────────────────
+let alertTimer = null;
+function showAlert(level, msg) {
+  const banner = document.getElementById('alert-banner');
+  document.getElementById('alert-msg').textContent = msg;
+  banner.className = `show ${level}`;
+  if (alertTimer) clearTimeout(alertTimer);
+  alertTimer = setTimeout(dismissAlert, 8000);
+}
+function dismissAlert() {
+  document.getElementById('alert-banner').className = '';
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function setEl(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+function fmt(v) { return v != null ? Math.round(v) : '—'; }
+function appendLog(msg) {
+  const log = document.getElementById('scan-log');
+  const p = document.createElement('p');
+  p.textContent = msg;
+  log.appendChild(p);
+  log.scrollTop = log.scrollHeight;
+}
+
+// ── Auto-fetch status on load ─────────────────────────────────────────────
+window.onload = () => {
+  fetch('/api/status').then(r => r.json()).then(d => {
+    if (d.connected) setConnected(d.device, d.port);
+    setMonitoringState(d.running);
+    if (d.demo) appendLog('ℹ  Demo mode active');
+  });
+};
+</script>
+</body>
+</html>

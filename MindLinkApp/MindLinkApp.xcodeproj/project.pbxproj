@@ -1,0 +1,397 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 63;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		02BEE40AAE8D75A06BDFB45E /* SignalProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676740F3657E651BAFE08AD4 /* SignalProcessor.swift */; };
+		0689A5B6B8F20C49F6EA1267 /* TGAM1Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E6550ACFBD80C115D49940 /* TGAM1Parser.swift */; };
+		2A5B6FB656306EE33BE6CF83 /* RawDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FDC26BC7617620C0A7AC0A4 /* RawDataView.swift */; };
+		49173D830DFF574A70855ED1 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D50318C14DBFBD68251416E2 /* CoreBluetooth.framework */; };
+		7568F0906BBD75CF6D950DA9 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873985ECF4DBF686E3A55F2C /* Config.swift */; };
+		940234E4000C7BC6204EF657 /* AlertSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BC6CD50188B3C2DBD90D48C /* AlertSystem.swift */; };
+		B56642CDDB343F37D5A5AE3C /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EADE1F8B8E1C7D2A5D2E8DA /* ExternalAccessory.framework */; };
+		B6FD6FAC0B58CD6FF7D4F0AD /* BluetoothManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70115CBB641A0A79C4BD470 /* BluetoothManager.swift */; };
+		C196100848D5578AA79F495C /* FatiguePredictor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F67874E951EA9F72B97E08F /* FatiguePredictor.swift */; };
+		C9C785228DF2F0F7A6B38BFE /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33621B35BD728DBF1AE44ED8 /* Components.swift */; };
+		CA4F2BA48F0D7C58FB4EE7C0 /* FeatureExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 861309FDA6E140518A0DE1EA /* FeatureExtractor.swift */; };
+		DC0D77ABBBCECC7414B9BD77 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB51686566773E41E999283 /* ContentView.swift */; };
+		DF595D82DADCF3ABF7CA3247 /* MindLinkApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DE4FBB6A6668EA2BE803697 /* MindLinkApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1DE4FBB6A6668EA2BE803697 /* MindLinkApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindLinkApp.swift; sourceTree = "<group>"; };
+		33621B35BD728DBF1AE44ED8 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		3BC6CD50188B3C2DBD90D48C /* AlertSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertSystem.swift; sourceTree = "<group>"; };
+		3EADE1F8B8E1C7D2A5D2E8DA /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
+		4F67874E951EA9F72B97E08F /* FatiguePredictor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FatiguePredictor.swift; sourceTree = "<group>"; };
+		4FDC26BC7617620C0A7AC0A4 /* RawDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawDataView.swift; sourceTree = "<group>"; };
+		676740F3657E651BAFE08AD4 /* SignalProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalProcessor.swift; sourceTree = "<group>"; };
+		6D63854F036A73E9C6F80A19 /* MindLinkApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MindLinkApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		861309FDA6E140518A0DE1EA /* FeatureExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureExtractor.swift; sourceTree = "<group>"; };
+		873985ECF4DBF686E3A55F2C /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		9AB51686566773E41E999283 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A9E6550ACFBD80C115D49940 /* TGAM1Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TGAM1Parser.swift; sourceTree = "<group>"; };
+		D50318C14DBFBD68251416E2 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
+		DFD8807F6EE5A3842CB1BAF6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		F70115CBB641A0A79C4BD470 /* BluetoothManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothManager.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7EAED24BAF2367A7491257C4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B56642CDDB343F37D5A5AE3C /* ExternalAccessory.framework in Frameworks */,
+				49173D830DFF574A70855ED1 /* CoreBluetooth.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2643D7B68F590C36931DB540 /* Bluetooth */ = {
+			isa = PBXGroup;
+			children = (
+				F70115CBB641A0A79C4BD470 /* BluetoothManager.swift */,
+				A9E6550ACFBD80C115D49940 /* TGAM1Parser.swift */,
+			);
+			path = Bluetooth;
+			sourceTree = "<group>";
+		};
+		66EF995BB3D68DA8E010BFF1 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				33621B35BD728DBF1AE44ED8 /* Components.swift */,
+				9AB51686566773E41E999283 /* ContentView.swift */,
+				4FDC26BC7617620C0A7AC0A4 /* RawDataView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		6FA301F7CB492BC7F2CF5365 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6D63854F036A73E9C6F80A19 /* MindLinkApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7954A8A9E7906AC2997A460E = {
+			isa = PBXGroup;
+			children = (
+				87DF8754E27C225D757CDD58 /* MindLinkApp */,
+				94A6D92EBA706236FC32E289 /* Frameworks */,
+				6FA301F7CB492BC7F2CF5365 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		87DF8754E27C225D757CDD58 /* MindLinkApp */ = {
+			isa = PBXGroup;
+			children = (
+				F9353BCC9BE11C801FA5D70D /* App */,
+				2643D7B68F590C36931DB540 /* Bluetooth */,
+				D0F2AE2723C2A0E3F4E65D22 /* Processing */,
+				66EF995BB3D68DA8E010BFF1 /* Views */,
+			);
+			path = MindLinkApp;
+			sourceTree = "<group>";
+		};
+		94A6D92EBA706236FC32E289 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D50318C14DBFBD68251416E2 /* CoreBluetooth.framework */,
+				3EADE1F8B8E1C7D2A5D2E8DA /* ExternalAccessory.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D0F2AE2723C2A0E3F4E65D22 /* Processing */ = {
+			isa = PBXGroup;
+			children = (
+				3BC6CD50188B3C2DBD90D48C /* AlertSystem.swift */,
+				873985ECF4DBF686E3A55F2C /* Config.swift */,
+				4F67874E951EA9F72B97E08F /* FatiguePredictor.swift */,
+				861309FDA6E140518A0DE1EA /* FeatureExtractor.swift */,
+				676740F3657E651BAFE08AD4 /* SignalProcessor.swift */,
+			);
+			path = Processing;
+			sourceTree = "<group>";
+		};
+		F9353BCC9BE11C801FA5D70D /* App */ = {
+			isa = PBXGroup;
+			children = (
+				DFD8807F6EE5A3842CB1BAF6 /* Info.plist */,
+				1DE4FBB6A6668EA2BE803697 /* MindLinkApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		7A451160A528FEDEBAF441E5 /* MindLinkApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7356846385A88CEF133E784C /* Build configuration list for PBXNativeTarget "MindLinkApp" */;
+			buildPhases = (
+				3D9CA9A7D6D61D26180137E9 /* Sources */,
+				7EAED24BAF2367A7491257C4 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MindLinkApp;
+			packageProductDependencies = (
+			);
+			productName = MindLinkApp;
+			productReference = 6D63854F036A73E9C6F80A19 /* MindLinkApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3E36364D3D2BA2E739A1EB30 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					7A451160A528FEDEBAF441E5 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = AB5F27806FE6881846F20A5E /* Build configuration list for PBXProject "MindLinkApp" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 7954A8A9E7906AC2997A460E;
+			minimizedProjectReferenceProxies = 1;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7A451160A528FEDEBAF441E5 /* MindLinkApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3D9CA9A7D6D61D26180137E9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				940234E4000C7BC6204EF657 /* AlertSystem.swift in Sources */,
+				B6FD6FAC0B58CD6FF7D4F0AD /* BluetoothManager.swift in Sources */,
+				C9C785228DF2F0F7A6B38BFE /* Components.swift in Sources */,
+				7568F0906BBD75CF6D950DA9 /* Config.swift in Sources */,
+				DC0D77ABBBCECC7414B9BD77 /* ContentView.swift in Sources */,
+				C196100848D5578AA79F495C /* FatiguePredictor.swift in Sources */,
+				CA4F2BA48F0D7C58FB4EE7C0 /* FeatureExtractor.swift in Sources */,
+				DF595D82DADCF3ABF7CA3247 /* MindLinkApp.swift in Sources */,
+				2A5B6FB656306EE33BE6CF83 /* RawDataView.swift in Sources */,
+				02BEE40AAE8D75A06BDFB45E /* SignalProcessor.swift in Sources */,
+				0689A5B6B8F20C49F6EA1267 /* TGAM1Parser.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0EFF2F9BF782D09AED1688CC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 74VALFMGKF;
+				INFOPLIST_FILE = MindLinkApp/App/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.mindlink.MindLinkApp;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		8A2434AC9350FBD0B0CF09F1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Debug;
+		};
+		BB6900AF01CB326B089BD74D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Release;
+		};
+		F3EAA30A81D62A6F27209A22 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 74VALFMGKF;
+				INFOPLIST_FILE = MindLinkApp/App/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.mindlink.MindLinkApp;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7356846385A88CEF133E784C /* Build configuration list for PBXNativeTarget "MindLinkApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F3EAA30A81D62A6F27209A22 /* Debug */,
+				0EFF2F9BF782D09AED1688CC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		AB5F27806FE6881846F20A5E /* Build configuration list for PBXProject "MindLinkApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8A2434AC9350FBD0B0CF09F1 /* Debug */,
+				BB6900AF01CB326B089BD74D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3E36364D3D2BA2E739A1EB30 /* Project object */;
+}

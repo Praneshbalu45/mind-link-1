@@ -40,26 +40,30 @@ class ESP32Connector:
         ports = serial.tools.list_ports.comports()
         return [port.device for port in ports]
     
-    def connect(self, port: Optional[str] = None) -> bool:
+    def connect(self, port: Optional[str] = None,
+                progress_callback=None) -> bool:
         """
-        Connect to ESP32/Arduino device
+        Connect to ESP32/Arduino device.
         Args:
-            port: Serial port name (e.g., 'COM3' on Windows, '/dev/ttyUSB0' on Linux)
+            port: Serial port name. Pass None to auto-detect (first/last port).
+            progress_callback: Optional callable(message) for status updates.
         Returns:
-            True if connection successful, False otherwise
+            True if connection successful, False otherwise.
         """
         if port:
             self.port = port
-        
+
         if not self.port:
-            # Auto-detect port
+            # Auto-detect: try the last port first (ESP32 usually appears last)
             ports = self.find_available_ports()
             if not ports:
                 logger.error("No serial ports found")
                 return False
-            # Prefer ports that might be ESP32 (often higher COM numbers)
             self.port = ports[-1] if len(ports) > 1 else ports[0]
-            logger.info(f"Auto-detected port: {self.port}")
+            msg = f"Auto-detected ESP32 port: {self.port}"
+            logger.info(msg)
+            if progress_callback:
+                progress_callback(msg)
         
         try:
             self.serial_conn = serial.Serial(
