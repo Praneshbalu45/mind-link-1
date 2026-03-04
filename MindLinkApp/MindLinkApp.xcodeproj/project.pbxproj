@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -37,7 +37,7 @@
 		4F67874E951EA9F72B97E08F /* FatiguePredictor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FatiguePredictor.swift; sourceTree = "<group>"; };
 		4FDC26BC7617620C0A7AC0A4 /* RawDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawDataView.swift; sourceTree = "<group>"; };
 		676740F3657E651BAFE08AD4 /* SignalProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalProcessor.swift; sourceTree = "<group>"; };
-		6D63854F036A73E9C6F80A19 /* MindLinkApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MindLinkApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6D63854F036A73E9C6F80A19 /* MindLinkApp.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MindLinkApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		861309FDA6E140518A0DE1EA /* FeatureExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureExtractor.swift; sourceTree = "<group>"; };
 		873985ECF4DBF686E3A55F2C /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		8E3AE48E5605331473BB7340 /* GoogleSMTPSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSMTPSender.swift; sourceTree = "<group>"; };
@@ -196,6 +196,7 @@
 			);
 			mainGroup = 7954A8A9E7906AC2997A460E;
 			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -239,7 +240,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 74VALFMGKF;
 				INFOPLIST_FILE = MindLinkApp/App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -385,7 +385,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 74VALFMGKF;
 				INFOPLIST_FILE = MindLinkApp/App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (

@@ -5,10 +5,8 @@ import Combine
 
 class AlertSettings: ObservableObject {
 
-    // ── Email / SMTP ──────────────────────────────────────────────────────
+    // ── Email ─────────────────────────────────────────────────────────────
     @Published var recipientEmail: String { didSet { save("recipientEmail", recipientEmail) } }
-    @Published var gmailSender: String    { didSet { save("gmailSender",    gmailSender)    } }
-    @Published var gmailAppPassword: String { didSet { save("gmailAppPwd",  gmailAppPassword) } }
     @Published var emailEnabled: Bool     { didSet { save("emailEnabled",   emailEnabled)   } }
 
     // ── Attention ─────────────────────────────────────────────────────────
@@ -37,8 +35,6 @@ class AlertSettings: ObservableObject {
     init() {
         let ud = UserDefaults.standard
         recipientEmail           = ud.string(forKey: "recipientEmail") ?? ""
-        gmailSender              = ud.string(forKey: "gmailSender")    ?? ""
-        gmailAppPassword         = ud.string(forKey: "gmailAppPwd")    ?? ""
         emailEnabled             = ud.bool(forKey: "emailEnabled")
         attentionAlertEnabled    = ud.object(forKey: "attnAlertOn")    as? Bool   ?? false
         attentionThreshold       = ud.object(forKey: "attnThresh")     as? Double ?? 40
@@ -111,21 +107,15 @@ class AlertSettings: ObservableObject {
     // MARK: - SMTP Send
 
     func sendEmail(subject: String, body: String) {
-        guard emailEnabled,
-              !gmailSender.isEmpty,
-              !gmailAppPassword.isEmpty,
-              !recipientEmail.isEmpty
-        else { return }
-        isSendingEmail = true
+        guard emailEnabled, !recipientEmail.isEmpty else { return }
+        isSendingEmail  = true
         lastEmailStatus = "Sending…"
         Task {
             do {
-                try await GoogleSMTPSender.shared.send(
-                    from:        gmailSender,
-                    appPassword: gmailAppPassword,
-                    to:          recipientEmail,
-                    subject:     subject,
-                    body:        body
+                try await SMTPSender.shared.send(
+                    to:      recipientEmail,
+                    subject: subject,
+                    body:    body
                 )
                 await MainActor.run {
                     self.lastEmailStatus = "✓ Sent at \(timeStr())"

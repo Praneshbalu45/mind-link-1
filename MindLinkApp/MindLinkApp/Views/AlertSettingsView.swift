@@ -12,27 +12,8 @@ struct AlertSettingsView: View {
             // ── Google SMTP Section ──────────────────────────────────────
             Section {
                 HStack {
-                    Image(systemName: "envelope").foregroundColor(.blue)
-                    Text("Sender Gmail")
-                    Spacer()
-                    TextField("you@gmail.com", text: $alertSettings.gmailSender)
-                        .multilineTextAlignment(.trailing)
-                        .keyboardType(.emailAddress)
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.never)
-                }
-                HStack {
-                    Image(systemName: "key").foregroundColor(.orange)
-                    Text("App Password")
-                    Spacer()
-                    SecureField("xxxx xxxx xxxx xxxx", text: $alertSettings.gmailAppPassword)
-                        .multilineTextAlignment(.trailing)
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.never)
-                }
-                HStack {
-                    Image(systemName: "person.circle").foregroundColor(.green)
-                    Text("Recipient Email")
+                    Image(systemName: "envelope").foregroundColor(AppTheme.accent)
+                    Text("Alert Recipient Email")
                     Spacer()
                     TextField("recipient@email.com", text: $alertSettings.recipientEmail)
                         .multilineTextAlignment(.trailing)
@@ -44,9 +25,9 @@ struct AlertSettingsView: View {
                     Label("Enable Email Alerts", systemImage: "bell.badge")
                 }
             } header: {
-                Label("Google SMTP", systemImage: "envelope.fill")
+                Label("Email Alerts", systemImage: "envelope.fill")
             } footer: {
-                Text("Use a Gmail App Password, not your regular password.\nGenerate one at: myaccount.google.com → Security → App passwords")
+                Text("Enter the email address where you want to receive EEG alerts.")
                     .font(.caption).foregroundColor(.secondary)
             }
 
