@@ -9,7 +9,7 @@ struct MetricCard: View {
     let accent: Color
     let subtitle: String?
 
-    init(title: String, value: String, accent: Color, subtitle: String? = nil) {
+    init(title: String, value: String, accent: Color = AppTheme.accent, subtitle: String? = nil) {
         self.title = title; self.value = value
         self.accent = accent; self.subtitle = subtitle
     }
@@ -18,7 +18,7 @@ struct MetricCard: View {
         VStack(spacing: 6) {
             Text(value)
                 .font(.system(size: 42, weight: .black, design: .rounded))
-                .foregroundColor(accent)
+                .foregroundColor(AppTheme.accent)
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
@@ -34,16 +34,16 @@ struct MetricCard: View {
                 Text(sub)
                     .font(.caption2)
                     .fontWeight(.bold)
-                    .foregroundColor(accent)
+                    .foregroundColor(AppTheme.accentMid)
             }
         }
         .frame(maxWidth: .infinity)
         .padding(14)
-        .background(Color(.systemGray6).opacity(0.5))
+        .background(AppTheme.cardBG)
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .strokeBorder(accent.opacity(0.3), lineWidth: 1)
+                .strokeBorder(AppTheme.accentDim, lineWidth: 1)
         )
     }
 }
@@ -65,10 +65,10 @@ struct BandBarChart: View {
     var body: some View {
         Chart(bands) { band in
             BarMark(
-                x: .value("Band", "\(band.symbol) \(band.name)"),
+                x: .value("Band", "\(band.symbol)\(band.name)"),
                 y: .value("Power", band.value)
             )
-            .foregroundStyle(band.color.gradient)
+            .foregroundStyle(AppTheme.accent)
             .cornerRadius(6)
             .annotation(position: .top) {
                 Text(String(format: "%.2f", band.value))
@@ -126,7 +126,7 @@ struct TrendChart: View {
                     x: .value("t", idx),
                     y: .value("Attention", r.attention)
                 )
-                .foregroundStyle(.blue.gradient)
+                .foregroundStyle(AppTheme.accent)
                 .lineStyle(StrokeStyle(lineWidth: 2))
                 .interpolationMethod(.catmullRom)
 
@@ -134,8 +134,8 @@ struct TrendChart: View {
                     x: .value("t", idx),
                     y: .value("Meditation", r.meditation)
                 )
-                .foregroundStyle(.green.gradient)
-                .lineStyle(StrokeStyle(lineWidth: 2))
+                .foregroundStyle(AppTheme.accentMid)
+                .lineStyle(StrokeStyle(lineWidth: 2, dash: [4,2]))
                 .interpolationMethod(.catmullRom)
             }
             .chartYScale(domain: 0...100)
@@ -148,8 +148,8 @@ struct TrendChart: View {
             }
             .chartLegend(position: .top, alignment: .trailing) {
                 HStack(spacing: 12) {
-                    Label("Attention", systemImage: "circle.fill").foregroundColor(.blue).font(.caption2)
-                    Label("Meditation", systemImage: "circle.fill").foregroundColor(.green).font(.caption2)
+                    Label("Attention",  systemImage: "circle.fill").foregroundColor(AppTheme.accent).font(.caption2)
+                    Label("Meditation", systemImage: "circle.fill").foregroundColor(AppTheme.accentMid).font(.caption2)
                 }
             }
         }
@@ -164,42 +164,25 @@ struct FatigueTrendChart: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Fatigue Score")
-                .font(.caption)
-                .fontWeight(.bold)
-                .foregroundColor(.secondary)
-                .textCase(.uppercase)
-                .tracking(0.5)
+                .font(.caption).fontWeight(.bold)
+                .foregroundColor(.secondary).textCase(.uppercase).tracking(0.5)
 
             Chart(Array(history.enumerated()), id: \.offset) { idx, r in
-                AreaMark(
-                    x: .value("t", idx),
-                    y: .value("Fatigue", r.fatigueScore)
-                )
-                .foregroundStyle(
-                    LinearGradient(colors: [.purple.opacity(0.4), .purple.opacity(0.05)],
-                                   startPoint: .top, endPoint: .bottom)
-                )
-                .interpolationMethod(.catmullRom)
-
-                LineMark(
-                    x: .value("t", idx),
-                    y: .value("Fatigue", r.fatigueScore)
-                )
-                .foregroundStyle(.purple.gradient)
-                .lineStyle(StrokeStyle(lineWidth: 2.5))
-                .interpolationMethod(.catmullRom)
-
-                // Warning lines
+                AreaMark(x: .value("t", idx), y: .value("Fatigue", r.fatigueScore))
+                    .foregroundStyle(AppTheme.accentDim)
+                    .interpolationMethod(.catmullRom)
+                LineMark(x: .value("t", idx), y: .value("Fatigue", r.fatigueScore))
+                    .foregroundStyle(AppTheme.accent)
+                    .lineStyle(StrokeStyle(lineWidth: 2.5))
+                    .interpolationMethod(.catmullRom)
                 RuleMark(y: .value("Warning", 0.3))
-                    .foregroundStyle(.orange.opacity(0.6))
+                    .foregroundStyle(AppTheme.warn.opacity(0.6))
                     .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
-
                 RuleMark(y: .value("Critical", 0.6))
-                    .foregroundStyle(.red.opacity(0.6))
+                    .foregroundStyle(AppTheme.danger.opacity(0.6))
                     .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
             }
-            .chartYScale(domain: 0...1)
-            .chartXAxis(.hidden)
+            .chartYScale(domain: 0...1).chartXAxis(.hidden)
             .chartYAxis {
                 AxisMarks(values: [0, 0.3, 0.6, 1.0]) { v in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))

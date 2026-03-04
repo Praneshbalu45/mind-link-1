@@ -91,7 +91,7 @@ class TGAM1Parser {
         case attention  = 0x04
         case meditation = 0x05
         case raw        = 0x80
-        case eegPower   = 0x81
+        case eegPower   = 0x83   // ← TGAM1 ASIC_EEG_POWER (was wrong 0x81)
     }
 
     func feed(_ bytes: [UInt8]) {
@@ -160,10 +160,9 @@ class TGAM1Parser {
             }
         }
 
-        // Fire callback:
-        // - Always fire when we get power data (most useful packet)
-        // - Fire on raw-only if no power data yet (early in session)  
-        if gotPower || (gotRaw && !state.hasPowerData) {
+        // Fire onPacket whenever we have any real data
+        let gotAttention = state.attention > 0 || state.meditation > 0
+        if gotPower || gotRaw || gotAttention {
             onPacket?(state)
         }
     }

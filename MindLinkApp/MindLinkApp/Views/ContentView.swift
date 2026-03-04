@@ -1,19 +1,15 @@
 import SwiftUI
 import Charts
-import MessageUI
 
 struct ContentView: View {
     @StateObject private var bt             = BluetoothManager()
     @StateObject private var alertSettings  = AlertSettings()
     @StateObject private var sessionManager = SessionManager()
 
-    @State private var history:        [EEGReading] = []
-    @State private var alertDismissed  = false
+    @State private var history:         [EEGReading] = []
+    @State private var alertDismissed   = false
     @State private var showDevicePicker = false
-    @State private var selectedTab     = 0
-    @State private var pendingMail:    AlertSettings.CustomAlert? = nil
-    @State private var showMail        = false
-    @State private var mailResult:     MailComposerView.MailResult? = nil
+    @State private var selectedTab      = 0
 
     private let maxHistory = 120
 
@@ -47,13 +43,6 @@ struct ContentView: View {
             .sheet(isPresented: $showDevicePicker) {
                 DevicePickerSheet(bt: bt, isPresented: $showDevicePicker)
             }
-            .sheet(isPresented: $showMail) {
-                if let alert = pendingMail {
-                    MailComposerView(toEmail: alertSettings.email,
-                                     subject: alert.subject, body: alert.body,
-                                     result: $mailResult)
-                }
-            }
         }
         .onAppear {
             NotificationManager.shared.requestPermission()
@@ -72,17 +61,13 @@ struct ContentView: View {
             let triggered = alertSettings.checkReading(r)
             for alert in triggered {
                 sessionManager.incrementAlerts()
-                // Push notification
                 NotificationManager.shared.send(
                     title: alert.subject,
                     body:  String(alert.body.prefix(200)),
                     identifier: "custom-\(alert.type)-\(Date().timeIntervalSince1970)"
                 )
-                // Email (first alert only)
-                if alertSettings.emailEnabled, !alertSettings.email.isEmpty,
-                   MFMailComposeViewController.canSendMail(), pendingMail == nil {
-                    pendingMail = alert; showMail = true
-                }
+                // Send via Google SMTP
+                alertSettings.sendEmail(subject: alert.subject, body: alert.body)
             }
         }
         .onChange(of: bt.discoveredDevices) { _, devices in
@@ -136,7 +121,7 @@ struct ContentView: View {
                 Circle().stroke(Color.purple.opacity(0.15), lineWidth: 8)
                 Circle()
                     .trim(from: 0, to: score / 100)
-                    .stroke(LinearGradient(colors: [.purple, .blue], startPoint: .topLeading, endPoint: .bottomTrailing),
+                    .stroke(Color.purple,
                             style: StrokeStyle(lineWidth: 8, lineCap: .round))
                     .rotationEffect(.degrees(-90))
                     .animation(.easeInOut(duration: 0.5), value: score)
@@ -302,11 +287,10 @@ struct ContentView: View {
     private var progressSection: some View {
         VStack(spacing: 10) {
             ZStack {
-                Circle().stroke(Color.purple.opacity(0.15), lineWidth: 10)
+                Circle().stroke(Color(.systemFill), lineWidth: 10)
                 Circle()
                     .trim(from: 0, to: bt.calibrationProgress)
-                    .stroke(LinearGradient(colors: [.purple, .indigo, .blue], startPoint: .topLeading, endPoint: .bottomTrailing),
-                            style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                    .stroke(Color.purple, style: StrokeStyle(lineWidth: 10, lineCap: .round))
                     .rotationEffect(.degrees(-90))
                     .animation(.easeInOut(duration: 0.4), value: bt.calibrationProgress)
                 VStack(spacing: 2) {

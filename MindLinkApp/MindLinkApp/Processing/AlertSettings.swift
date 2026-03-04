@@ -1,145 +1,161 @@
 import Foundation
 import Combine
 
-// MARK: - Alert Settings (persisted in UserDefaults via @AppStorage equivalent)
+// MARK: - Alert Settings (persisted in UserDefaults)
 
 class AlertSettings: ObservableObject {
 
-    // Email
-    @Published var email: String {
-        didSet { UserDefaults.standard.set(email, forKey: "alertEmail") }
-    }
-    @Published var emailEnabled: Bool {
-        didSet { UserDefaults.standard.set(emailEnabled, forKey: "alertEmailEnabled") }
-    }
+    // ── Email / SMTP ──────────────────────────────────────────────────────
+    @Published var recipientEmail: String { didSet { save("recipientEmail", recipientEmail) } }
+    @Published var gmailSender: String    { didSet { save("gmailSender",    gmailSender)    } }
+    @Published var gmailAppPassword: String { didSet { save("gmailAppPwd",  gmailAppPassword) } }
+    @Published var emailEnabled: Bool     { didSet { save("emailEnabled",   emailEnabled)   } }
 
-    // Attention
-    @Published var attentionAlertEnabled: Bool {
-        didSet { UserDefaults.standard.set(attentionAlertEnabled, forKey: "attentionAlertEnabled") }
-    }
-    @Published var attentionThreshold: Double {
-        didSet { UserDefaults.standard.set(attentionThreshold, forKey: "attentionThreshold") }
-    }
+    // ── Attention ─────────────────────────────────────────────────────────
+    @Published var attentionAlertEnabled: Bool   { didSet { save("attnAlertOn", attentionAlertEnabled) } }
+    @Published var attentionThreshold: Double    { didSet { save("attnThresh",  attentionThreshold)   } }
 
-    // Meditation
-    @Published var meditationAlertEnabled: Bool {
-        didSet { UserDefaults.standard.set(meditationAlertEnabled, forKey: "meditationAlertEnabled") }
-    }
-    @Published var meditationThreshold: Double {
-        didSet { UserDefaults.standard.set(meditationThreshold, forKey: "meditationThreshold") }
-    }
+    // ── Meditation ────────────────────────────────────────────────────────
+    @Published var meditationAlertEnabled: Bool  { didSet { save("medAlertOn",  meditationAlertEnabled) } }
+    @Published var meditationThreshold: Double   { didSet { save("medThresh",   meditationThreshold)   } }
 
-    // Fatigue
-    @Published var fatigueAlertEnabled: Bool {
-        didSet { UserDefaults.standard.set(fatigueAlertEnabled, forKey: "fatigueAlertEnabled") }
-    }
-    @Published var fatigueThreshold: Double {
-        didSet { UserDefaults.standard.set(fatigueThreshold, forKey: "fatigueThreshold") }
-    }
+    // ── Fatigue ───────────────────────────────────────────────────────────
+    @Published var fatigueAlertEnabled: Bool     { didSet { save("fatAlertOn",  fatigueAlertEnabled) } }
+    @Published var fatigueThreshold: Double      { didSet { save("fatThresh",   fatigueThreshold)   } }
 
-    // Cooldown
-    @Published var cooldownMinutes: Double {
-        didSet { UserDefaults.standard.set(cooldownMinutes, forKey: "alertCooldownMinutes") }
-    }
+    // ── Cooldown ──────────────────────────────────────────────────────────
+    @Published var cooldownMinutes: Double        { didSet { save("cooldown",    cooldownMinutes)   } }
 
-    // Last alert times (for cooldown)
-    private var lastAttentionAlert: Date? = nil
+    // ── Status (UI feedback) ──────────────────────────────────────────────
+    @Published var lastEmailStatus: String = ""
+    @Published var isSendingEmail  = false
+
+    private var lastAttentionAlert:  Date? = nil
     private var lastMeditationAlert: Date? = nil
-    private var lastFatigueAlert: Date? = nil
+    private var lastFatigueAlert:    Date? = nil
 
     init() {
-        email                  = UserDefaults.standard.string(forKey: "alertEmail") ?? ""
-        emailEnabled           = UserDefaults.standard.bool(forKey: "alertEmailEnabled")
-        attentionAlertEnabled  = UserDefaults.standard.object(forKey: "attentionAlertEnabled") as? Bool ?? false
-        attentionThreshold     = UserDefaults.standard.object(forKey: "attentionThreshold")    as? Double ?? 40
-        meditationAlertEnabled = UserDefaults.standard.object(forKey: "meditationAlertEnabled") as? Bool ?? false
-        meditationThreshold    = UserDefaults.standard.object(forKey: "meditationThreshold")   as? Double ?? 30
-        fatigueAlertEnabled    = UserDefaults.standard.object(forKey: "fatigueAlertEnabled")   as? Bool ?? true
-        fatigueThreshold       = UserDefaults.standard.object(forKey: "fatigueThreshold")      as? Double ?? 0.4
-        cooldownMinutes        = UserDefaults.standard.object(forKey: "alertCooldownMinutes")  as? Double ?? 5
+        let ud = UserDefaults.standard
+        recipientEmail           = ud.string(forKey: "recipientEmail") ?? ""
+        gmailSender              = ud.string(forKey: "gmailSender")    ?? ""
+        gmailAppPassword         = ud.string(forKey: "gmailAppPwd")    ?? ""
+        emailEnabled             = ud.bool(forKey: "emailEnabled")
+        attentionAlertEnabled    = ud.object(forKey: "attnAlertOn")    as? Bool   ?? false
+        attentionThreshold       = ud.object(forKey: "attnThresh")     as? Double ?? 40
+        meditationAlertEnabled   = ud.object(forKey: "medAlertOn")     as? Bool   ?? false
+        meditationThreshold      = ud.object(forKey: "medThresh")      as? Double ?? 30
+        fatigueAlertEnabled      = ud.object(forKey: "fatAlertOn")     as? Bool   ?? true
+        fatigueThreshold         = ud.object(forKey: "fatThresh")      as? Double ?? 0.4
+        cooldownMinutes          = ud.object(forKey: "cooldown")       as? Double ?? 5
     }
 
-    // MARK: - Check reading against custom thresholds
+    // MARK: - Check thresholds
 
     struct CustomAlert {
         let type:    AlertType
         let subject: String
         let body:    String
     }
-
     enum AlertType { case attention, meditation, fatigue }
 
-    func checkReading(_ reading: EEGReading) -> [CustomAlert] {
-        var triggered: [CustomAlert] = []
-        let cooldown = cooldownMinutes * 60
+    func checkReading(_ r: EEGReading) -> [CustomAlert] {
+        var out: [CustomAlert] = []
+        let cd = cooldownMinutes * 60
 
-        if attentionAlertEnabled && reading.attention < attentionThreshold {
-            if canFire(&lastAttentionAlert, cooldown: cooldown) {
-                triggered.append(CustomAlert(
-                    type: .attention,
-                    subject: "⚠️ Low Attention Alert",
-                    body: """
-                    Your MindLink app detected low attention.
-
-                    Current attention level: \(Int(reading.attention)) / 100
-                    Your threshold: below \(Int(attentionThreshold))
-
-                    Consider taking a short break or refocusing your task.
-
-                    — MindLink EEG Monitor
-                    """
-                ))
-                lastAttentionAlert = Date()
-            }
+        if attentionAlertEnabled && r.attention < attentionThreshold, canFire(&lastAttentionAlert, cooldown: cd) {
+            out.append(CustomAlert(type: .attention,
+                subject: "⚠️ Low Attention — MindLink",
+                body: """
+                Your attention level dropped below your threshold.
+                
+                Current:   \(Int(r.attention)) / 100
+                Threshold: below \(Int(attentionThreshold))
+                
+                Take a short break or refocus your task.
+                — MindLink EEG Monitor
+                """))
+            lastAttentionAlert = Date()
         }
-
-        if meditationAlertEnabled && reading.meditation < meditationThreshold {
-            if canFire(&lastMeditationAlert, cooldown: cooldown) {
-                triggered.append(CustomAlert(
-                    type: .meditation,
-                    subject: "⚠️ Low Meditation Alert",
-                    body: """
-                    Your MindLink app detected low meditation (high stress).
-
-                    Current meditation level: \(Int(reading.meditation)) / 100
-                    Your threshold: below \(Int(meditationThreshold))
-
-                    Try deep breathing or a short mindfulness exercise.
-
-                    — MindLink EEG Monitor
-                    """
-                ))
-                lastMeditationAlert = Date()
-            }
+        if meditationAlertEnabled && r.meditation < meditationThreshold, canFire(&lastMeditationAlert, cooldown: cd) {
+            out.append(CustomAlert(type: .meditation,
+                subject: "⚠️ High Stress — MindLink",
+                body: """
+                Your meditation (calm) level is low — stress detected.
+                
+                Current:   \(Int(r.meditation)) / 100
+                Threshold: below \(Int(meditationThreshold))
+                
+                Try deep breathing for 2 minutes.
+                — MindLink EEG Monitor
+                """))
+            lastMeditationAlert = Date()
         }
-
-        if fatigueAlertEnabled && reading.fatigueScore > fatigueThreshold {
-            if canFire(&lastFatigueAlert, cooldown: cooldown) {
-                let level = reading.fatigueLevel.rawValue
-                triggered.append(CustomAlert(
-                    type: .fatigue,
-                    subject: "🔴 \(level) Fatigue Alert",
-                    body: """
-                    Your MindLink app detected \(level.lowercased()) fatigue.
-
-                    Fatigue score: \(String(format: "%.2f", reading.fatigueScore)) / 1.0
-                    Cognitive drift: \(String(format: "%.3f", reading.cognitiveDrift))
-                    Your threshold: above \(String(format: "%.1f", fatigueThreshold))
-
-                    Please take a break. Adequate rest improves performance and wellbeing.
-
-                    — MindLink EEG Monitor
-                    """
-                ))
-                lastFatigueAlert = Date()
-            }
+        if fatigueAlertEnabled && r.fatigueScore > fatigueThreshold, canFire(&lastFatigueAlert, cooldown: cd) {
+            out.append(CustomAlert(type: .fatigue,
+                subject: "🔴 \(r.fatigueLevel.rawValue) Fatigue — MindLink",
+                body: """
+                Fatigue level: \(r.fatigueLevel.rawValue)
+                
+                Fatigue score:    \(String(format: "%.2f", r.fatigueScore)) / 1.0
+                Cognitive drift:  \(String(format: "%.3f", r.cognitiveDrift))
+                Threshold:        above \(String(format: "%.1f", fatigueThreshold))
+                
+                Please rest. Sustained fatigue reduces performance.
+                — MindLink EEG Monitor
+                """))
+            lastFatigueAlert = Date()
         }
-
-        return triggered
+        return out
     }
+
+    // MARK: - SMTP Send
+
+    func sendEmail(subject: String, body: String) {
+        guard emailEnabled,
+              !gmailSender.isEmpty,
+              !gmailAppPassword.isEmpty,
+              !recipientEmail.isEmpty
+        else { return }
+        isSendingEmail = true
+        lastEmailStatus = "Sending…"
+        Task {
+            do {
+                try await GoogleSMTPSender.shared.send(
+                    from:        gmailSender,
+                    appPassword: gmailAppPassword,
+                    to:          recipientEmail,
+                    subject:     subject,
+                    body:        body
+                )
+                await MainActor.run {
+                    self.lastEmailStatus = "✓ Sent at \(timeStr())"
+                    self.isSendingEmail  = false
+                }
+            } catch {
+                await MainActor.run {
+                    self.lastEmailStatus = "✗ Failed: \(error.localizedDescription)"
+                    self.isSendingEmail  = false
+                }
+            }
+        }
+    }
+
+    // MARK: - Helpers
 
     private func canFire(_ last: inout Date?, cooldown: Double) -> Bool {
         guard let l = last else { return true }
         return Date().timeIntervalSince(l) >= cooldown
+    }
+    private func timeStr() -> String {
+        let f = DateFormatter(); f.timeStyle = .short; return f.string(from: Date())
+    }
+    private func save(_ key: String, _ val: Any) { UserDefaults.standard.set(val, forKey: key) }
+    private func str(_ key: String)              -> String { UserDefaults.standard.string(forKey: key) ?? "" }
+    private func bool(_ key: String)             -> Bool   { UserDefaults.standard.bool(forKey: key) }
+    private func bool2(_ key: String, def: Bool = false) -> Bool {
+        UserDefaults.standard.object(forKey: key) as? Bool ?? def
+    }
+    private func dbl(_ key: String, def: Double) -> Double {
+        UserDefaults.standard.object(forKey: key) as? Double ?? def
     }
 }

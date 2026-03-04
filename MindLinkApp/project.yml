@@ -27,7 +27,6 @@ targets:
     dependencies:
       - sdk: ExternalAccessory.framework
       - sdk: CoreBluetooth.framework
-      - sdk: MessageUI.framework
     info:
       path: MindLinkApp/App/Info.plist
       properties:
