@@ -11,15 +11,21 @@
 		0689A5B6B8F20C49F6EA1267 /* TGAM1Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E6550ACFBD80C115D49940 /* TGAM1Parser.swift */; };
 		2A5B6FB656306EE33BE6CF83 /* RawDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FDC26BC7617620C0A7AC0A4 /* RawDataView.swift */; };
 		49173D830DFF574A70855ED1 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D50318C14DBFBD68251416E2 /* CoreBluetooth.framework */; };
+		739E37A5A8910ED42C0F0251 /* AlertSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4ED4885CCF8F23621598AF /* AlertSettingsView.swift */; };
 		7568F0906BBD75CF6D950DA9 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 873985ECF4DBF686E3A55F2C /* Config.swift */; };
+		8775A574ECCFAFA362BD97B2 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70900134D8A2BEDF67BE36E0 /* MessageUI.framework */; };
+		929BBE68A166F3AA4EFE2385 /* SessionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2EA32CDC737825E3CD24BDF /* SessionHistoryView.swift */; };
 		940234E4000C7BC6204EF657 /* AlertSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BC6CD50188B3C2DBD90D48C /* AlertSystem.swift */; };
+		94E194E9F0BE7B50E0155113 /* AlertSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99ADEAA5DF6C2781268E9668 /* AlertSettings.swift */; };
 		B56642CDDB343F37D5A5AE3C /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EADE1F8B8E1C7D2A5D2E8DA /* ExternalAccessory.framework */; };
 		B6FD6FAC0B58CD6FF7D4F0AD /* BluetoothManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70115CBB641A0A79C4BD470 /* BluetoothManager.swift */; };
 		C196100848D5578AA79F495C /* FatiguePredictor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F67874E951EA9F72B97E08F /* FatiguePredictor.swift */; };
+		C21DB73532A18EAE9548BCEF /* BrainWavesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF050534A51689050974E0A4 /* BrainWavesView.swift */; };
 		C9C785228DF2F0F7A6B38BFE /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33621B35BD728DBF1AE44ED8 /* Components.swift */; };
 		CA4F2BA48F0D7C58FB4EE7C0 /* FeatureExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 861309FDA6E140518A0DE1EA /* FeatureExtractor.swift */; };
 		DC0D77ABBBCECC7414B9BD77 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AB51686566773E41E999283 /* ContentView.swift */; };
 		DF595D82DADCF3ABF7CA3247 /* MindLinkApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DE4FBB6A6668EA2BE803697 /* MindLinkApp.swift */; };
+		EB20A9D4B190817A0FA8D20F /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69D8F8C5A38B41CF4199A8A /* SessionManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,13 +37,19 @@
 		4FDC26BC7617620C0A7AC0A4 /* RawDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawDataView.swift; sourceTree = "<group>"; };
 		676740F3657E651BAFE08AD4 /* SignalProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalProcessor.swift; sourceTree = "<group>"; };
 		6D63854F036A73E9C6F80A19 /* MindLinkApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MindLinkApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		70900134D8A2BEDF67BE36E0 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		861309FDA6E140518A0DE1EA /* FeatureExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureExtractor.swift; sourceTree = "<group>"; };
 		873985ECF4DBF686E3A55F2C /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		99ADEAA5DF6C2781268E9668 /* AlertSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertSettings.swift; sourceTree = "<group>"; };
 		9AB51686566773E41E999283 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A9E6550ACFBD80C115D49940 /* TGAM1Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TGAM1Parser.swift; sourceTree = "<group>"; };
+		B69D8F8C5A38B41CF4199A8A /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+		CC4ED4885CCF8F23621598AF /* AlertSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertSettingsView.swift; sourceTree = "<group>"; };
+		D2EA32CDC737825E3CD24BDF /* SessionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionHistoryView.swift; sourceTree = "<group>"; };
 		D50318C14DBFBD68251416E2 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		DFD8807F6EE5A3842CB1BAF6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F70115CBB641A0A79C4BD470 /* BluetoothManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothManager.swift; sourceTree = "<group>"; };
+		FF050534A51689050974E0A4 /* BrainWavesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrainWavesView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +59,7 @@
 			files = (
 				B56642CDDB343F37D5A5AE3C /* ExternalAccessory.framework in Frameworks */,
 				49173D830DFF574A70855ED1 /* CoreBluetooth.framework in Frameworks */,
+				8775A574ECCFAFA362BD97B2 /* MessageUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,9 +78,12 @@
 		66EF995BB3D68DA8E010BFF1 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				CC4ED4885CCF8F23621598AF /* AlertSettingsView.swift */,
+				FF050534A51689050974E0A4 /* BrainWavesView.swift */,
 				33621B35BD728DBF1AE44ED8 /* Components.swift */,
 				9AB51686566773E41E999283 /* ContentView.swift */,
 				4FDC26BC7617620C0A7AC0A4 /* RawDataView.swift */,
+				D2EA32CDC737825E3CD24BDF /* SessionHistoryView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -105,6 +121,7 @@
 			children = (
 				D50318C14DBFBD68251416E2 /* CoreBluetooth.framework */,
 				3EADE1F8B8E1C7D2A5D2E8DA /* ExternalAccessory.framework */,
+				70900134D8A2BEDF67BE36E0 /* MessageUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -112,10 +129,12 @@
 		D0F2AE2723C2A0E3F4E65D22 /* Processing */ = {
 			isa = PBXGroup;
 			children = (
+				99ADEAA5DF6C2781268E9668 /* AlertSettings.swift */,
 				3BC6CD50188B3C2DBD90D48C /* AlertSystem.swift */,
 				873985ECF4DBF686E3A55F2C /* Config.swift */,
 				4F67874E951EA9F72B97E08F /* FatiguePredictor.swift */,
 				861309FDA6E140518A0DE1EA /* FeatureExtractor.swift */,
+				B69D8F8C5A38B41CF4199A8A /* SessionManager.swift */,
 				676740F3657E651BAFE08AD4 /* SignalProcessor.swift */,
 			);
 			path = Processing;
@@ -188,8 +207,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				94E194E9F0BE7B50E0155113 /* AlertSettings.swift in Sources */,
+				739E37A5A8910ED42C0F0251 /* AlertSettingsView.swift in Sources */,
 				940234E4000C7BC6204EF657 /* AlertSystem.swift in Sources */,
 				B6FD6FAC0B58CD6FF7D4F0AD /* BluetoothManager.swift in Sources */,
+				C21DB73532A18EAE9548BCEF /* BrainWavesView.swift in Sources */,
 				C9C785228DF2F0F7A6B38BFE /* Components.swift in Sources */,
 				7568F0906BBD75CF6D950DA9 /* Config.swift in Sources */,
 				DC0D77ABBBCECC7414B9BD77 /* ContentView.swift in Sources */,
@@ -197,6 +219,8 @@
 				CA4F2BA48F0D7C58FB4EE7C0 /* FeatureExtractor.swift in Sources */,
 				DF595D82DADCF3ABF7CA3247 /* MindLinkApp.swift in Sources */,
 				2A5B6FB656306EE33BE6CF83 /* RawDataView.swift in Sources */,
+				929BBE68A166F3AA4EFE2385 /* SessionHistoryView.swift in Sources */,
+				EB20A9D4B190817A0FA8D20F /* SessionManager.swift in Sources */,
 				02BEE40AAE8D75A06BDFB45E /* SignalProcessor.swift in Sources */,
 				0689A5B6B8F20C49F6EA1267 /* TGAM1Parser.swift in Sources */,
 			);
